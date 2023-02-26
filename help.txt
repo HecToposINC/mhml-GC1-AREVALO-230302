@@ -1,0 +1,13 @@
+Write the H code that you want or write something to browse. You can also search by "Tag:", "Artist:", "Character:" or "Parody:".
+
+If you want to search more set "Page:" and a number at the end of your request.
+
+/help : Show commands and function
+/stop : Stop the current sent
+/search5 : Search set to 5
+/search10 : Search set to 10
+/search15 : Search set to 15
+/search20 : Search set to 20
+/search25 : Search set to 25
+/donate : Gives you the PayPal donation link
+This bot uses https://nhentai.xxx
