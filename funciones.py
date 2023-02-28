@@ -12,8 +12,7 @@ def collect_search(texto,cantidad):
     url,texto=correcturl(texto) #Identifica el tipo de BG
     page = requests.get(url,verify=False) #Se almacena el contenido de la pagina en una variable
     if page.status_code==200: #Verifica si la página de la BG existe
-        verificarContenido(cantidad,page.text,lista_imagenes,lista_codigos) #Verifica si existe contenido en la página
-        return lista_imagenes,lista_codigos
+        return verificarContenido(cantidad,page.text,lista_imagenes,lista_codigos) #Verifica si existe contenido en la página
     return "No H in search",None
 
 def guardarImagen(lista_imagenes,page): #Guarda el contenido recibido en la lista recibida

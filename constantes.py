@@ -1,4 +1,4 @@
-API_KEY='AQUI VA EL TOKEN DEL BOT' #NO PONGO EL MÍO PORQUE ES COMO UNA CONTRASEÑA
+API_KEY='6022176803:AAEBeT-Y-qbQjMEpw27YFQ80I-XyCw5eHAQ'
 NUM=['1','2','3','4','5','6','7','8','9','0']
 URL_IMG="https://nhentai.xxx/g/"
 URL_SEARCH="https://nhentai.xxx/search/?q="
