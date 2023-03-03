@@ -1,4 +1,4 @@
-API_KEY='6022176803:AAEBeT-Y-qbQjMEpw27YFQ80I-XyCw5eHAQ'
+API_KEY=''#INGRESA EL TOKEN DEL BOT AQUÍ
 NUM=['1','2','3','4','5','6','7','8','9','0']
 URL_IMG="https://nhentai.xxx/g/"
 URL_SEARCH="https://nhentai.xxx/search/?q="
@@ -8,4 +8,3 @@ URL_CHARACTER="https://nhentai.xxx/character/"
 URL_PARODY="https://nhentai.xxx/parody/"
 TAGPAGE="?page="
 SEARCHPAGE="&page="
-LINK_DONACION="https://www.paypal.com/donate/?hosted_button_id=JQXBRC88DKTSA"

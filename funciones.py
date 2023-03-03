@@ -6,39 +6,66 @@ import constantes as llaves
 def collect_search(texto,cantidad):
     lista_imagenes=[]
     lista_codigos=[]
-    requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning) #Desactiva advertencias en terminal
+    requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
     session = requests.Session()
     session.verify = False
-    url,texto=correcturl(texto) #Identifica el tipo de BG
+    url,texto=correcturl(texto)
     page = requests.get(url,verify=False) #Se almacena el contenido de la pagina en una variable
-    if page.status_code==200: #Verifica si la página de la BG existe
-        return verificarContenido(cantidad,page.text,lista_imagenes,lista_codigos) #Verifica si existe contenido en la página
+    if page.status_code==200:
+        urlpagina=page.text
+        j=0
+        while j<cantidad:
+            buffer=""
+            index=int(find_nth_overlapping(urlpagina,"thumb",j*2+1))
+            buffer=urlpagina[index-34:index-1]+"/cover"
+            url = buffer+'.jpg' #Se ingresa a la direccion url de cada imagen de hentai
+            if "png" in urlpagina[index:index+20]:
+                url = buffer+'.png' #Se ingresa a la direccion url de cada imagen de hentai
+            if "gif" in urlpagina[index:index+20]:
+                url = buffer+'.gif' #Se ingresa a la direccion url de cada imagen de hentai
+            if "\n" in url:
+                if len(lista_imagenes)!=0:
+                    return lista_imagenes, lista_codigos
+                return "No H in search",None
+            index=int(find_nth_overlapping(urlpagina,"class=\"cover\"",j+1))
+            codigo=urlpagina[index-9:index-3]
+            papa=True
+            while papa:
+                if "/" in codigo:
+                    codigo=codigo[codigo.find("/")+1:]
+                else: papa=False
+            lista_codigos.append(codigo)
+            url=url[url.find("https"):]
+            page = requests.get(url) #Se almacena el contenido de la pagina en una variable
+            if page.status_code!=200:
+                buffer=buffer[1:] #PARCHE FEO PERO NECESARIO
+                url = buffer+'.gif' #Se ingresa a la direccion url de cada imagen de hentai
+                page = requests.get(url) #Se almacena el contenido de la pagina en una variable
+            lista_imagenes.append(page.content)
+            j=j+1
+        return lista_imagenes,lista_codigos
     return "No H in search",None
-
-def guardarImagen(lista_imagenes,page): #Guarda el contenido recibido en la lista recibida
-    lista_imagenes.append(page.content)
-
-def download_image(code,tipo): #Obtiene las imagenes de la BPC
+def download_image(code,tipo):
     lista_imagenes=[]
-    requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning) #Desactiva advertencias en terminal
+    requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
     session = requests.Session()
     session.verify = False 
-    url = llaves.URL_IMG+code+"/" #Obtiene la url de la BPC
+    url = llaves.URL_IMG+code+"/"
     page = requests.get(url,verify=False) #Se almacena el contenido de la pagina en una variable
-    if page.status_code==200: #Verifica la existencia de la página
-        urlpagina=geturlpagina(page.text) #Obtiene la url base de las imágenes
+    if page.status_code==200:
+        urlpagina=geturlpagina(page.text)
         more=True
         i=1
         while(more is True):
-            page,more=getimages(urlpagina,True,i) #Verifica si existe otra imagen y la obtiene
+            page,more=getimages(urlpagina,True,i)
             if more:
-                guardarImagen(lista_imagenes,page) #Guarda el contenido en la lista de imágenes
+                lista_imagenes.append(page.content)
             i=i+1
-    if len(lista_imagenes)==0: #Identifica si se obtuvo contenido
+    if len(lista_imagenes)==0:
         return "H not founded"
     return lista_imagenes
 
-def checanum(a): #Verifica si se tiene solicitó una BPC o BG
+def checanum(a):
     papalist=[]
     papa=False
     for x in a:
@@ -51,16 +78,16 @@ def checanum(a): #Verifica si se tiene solicitó una BPC o BG
         return False
     return True
 
-def find_nth_overlapping(haystack, needle, n): #Identifica la localización de un subtring repetido en un string
+def find_nth_overlapping(haystack, needle, n):
     start = haystack.find(needle)
     while start >= 0 and n > 1:
         start = haystack.find(needle, start+1)
         n -= 1
     return start
     
-def correcturl(text): #Identifica el tipo de BG
+def correcturl(text):
     url=llaves.URL_SEARCH
-    urlfinal=setpage(text) #Identifica si se solicitó más contenido
+    urlfinal=setpage(text)
     if "tag:" in text:
         if "tag: " in text: text=text.replace("tag: ","")
         else: text=text.replace("tag:","")
@@ -84,7 +111,7 @@ def correcturl(text): #Identifica el tipo de BG
     else:url=url+str(text).replace(" ","-")+"/"+urlfinal
     return url,text
 
-def setpage(text): #Identifica si se solicitó más contenido
+def setpage(text):
     if "page:" in text:
         if " page: " in text:
             texto=text[text.find("page: ")+6:]
@@ -94,20 +121,20 @@ def setpage(text): #Identifica si se solicitó más contenido
         return llaves.SEARCHPAGE+texto
     return ""
 
-def getimages(urlpagina,more,i): #Verifica si existe una imagen y la obtiene
-    url = urlpagina+'/'+str(i)+'.jpg' 
-    page = requests.get(url) 
-    if page.status_code!=200: #Se identifica si la imagen es jpg
-        url = urlpagina+'/'+str(i)+'.png' #Se identifica si la imagen es png
-        page = requests.get(url)
+def getimages(urlpagina,more,i):
+    url = urlpagina+'/'+str(i)+'.jpg' #Se ingresa a la direccion url de cada imagen de hentai
+    page = requests.get(url) #Se almacena el contenido de la pagina en una variable
+    if page.status_code!=200:
+        url = urlpagina+'/'+str(i)+'.png' #Se ingresa a la direccion url de cada imagen de hentai
+        page = requests.get(url) #Se almacena el contenido de la pagina en una variable
         if page.status_code!=200:
-            url = urlpagina+'/'+str(i)+'.gif' #Se identifica si la imagen es gif
-            page = requests.get(url)
-            if page.status_code!=200: #Se identifica su hubo o no más imágenes
+            url = urlpagina+'/'+str(i)+'.gif' #Se ingresa a la direccion url de cada imagen de hentai
+            page = requests.get(url) #Se almacena el contenido de la pagina en una variable
+            if page.status_code!=200:
                 more=False
     return page,more
 
-def geturlpagina(urlpagina): #Obtiene la url base de las imágenes
+def geturlpagina(urlpagina):
     if "cover.jpg" in urlpagina:
         urlpagina=urlpagina[urlpagina.find("cover.jpg",2)-34:urlpagina.find("cover.jpg",2)]
     else:
@@ -116,44 +143,3 @@ def geturlpagina(urlpagina): #Obtiene la url base de las imágenes
         else: urlpagina=urlpagina[urlpagina.find("cover.gif",2)-34:urlpagina.find("cover.gif",2)]
     return urlpagina[urlpagina.find("https",0):len(urlpagina)-1]
 
-def enHilo(usuarios,inthread,id): #Identifica si el usuario está en un hilo o no
-    i=0
-    numUsuario=95
-    for usuario in usuarios:
-        if usuario==id:
-            if inthread[i]==False:
-                numUsuario=i
-                return numUsuario,False
-        i=i+1
-    return numUsuario,True
-
-def verificarContenido(cantidad,urlpagina,lista_imagenes,lista_codigos): #Verifica si existe contenido en la página
-    j=0
-    while j<cantidad:
-        buffer=""
-        index=int(find_nth_overlapping(urlpagina,"thumb",j*2+1))
-        buffer=urlpagina[index-34:index-1]+"/cover"
-        url = buffer+'.jpg'
-        if "png" in urlpagina[index:index+20]: #Se verifica el tipo de imagen que representa el H
-            url = buffer+'.png'
-        if "gif" in urlpagina[index:index+20]:
-            url = buffer+'.gif'
-        if "\n" in url: #Se asegura que se haya obtenido una url
-            if len(lista_imagenes)!=0: #En el caso de haber obtenido contenido lo manda y en caso contrario manda mensaje
-                return lista_imagenes, lista_codigos 
-            return "No H in search",None
-        index=int(find_nth_overlapping(urlpagina,"class=\"cover\"",j+1)) #Se identifica la ubicación del H dentro de la página
-        codigo=urlpagina[index-9:index-3]
-        papa=True
-        while papa: #Se obtienen los códigos H de las imágenes obtenidas anteriormente
-            if "/" in codigo:
-                codigo=codigo[codigo.find("/")+1:]
-            else: papa=False
-        lista_codigos.append(codigo)
-        url=url[url.find("https"):]
-        page = requests.get(url)
-        if page.status_code!=200: #Se identifica si la imagen es gif
-            url = buffer+'/.gif'
-            page = requests.get(url)
-        guardarImagen(lista_imagenes,page) #Guarda el contenido en la lista de imágenes
-        j=j+1
