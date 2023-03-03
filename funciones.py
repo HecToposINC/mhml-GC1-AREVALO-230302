@@ -143,3 +143,14 @@ def geturlpagina(urlpagina):
         else: urlpagina=urlpagina[urlpagina.find("cover.gif",2)-34:urlpagina.find("cover.gif",2)]
     return urlpagina[urlpagina.find("https",0):len(urlpagina)-1]
 
+def enHilo(usuarios,inthread,id): #Identifica si el usuario está en un hilo o no
+    i=0
+    numUsuario=95
+    for usuario in usuarios:
+        if usuario==id:
+            if inthread[i]==False:
+                numUsuario=i
+                return numUsuario,False
+        i=i+1
+    return numUsuario,True
+
